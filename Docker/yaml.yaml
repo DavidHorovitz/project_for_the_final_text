@@ -1,0 +1,105 @@
+version: "3.9"
+
+services:
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  retriever:
+    build: ./retriever
+    container_name: retriever
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+    networks:
+      - pipeline_net
+
+  preprocessor:
+    build: ./preprocessor
+    container_name: preprocessor
+    depends_on:
+      - retriever
+    networks:
+      - pipeline_net
+
+  enricher:
+    build: ./enricher
+    container_name: enricher
+    depends_on:
+      - preprocessor
+    networks:
+      - pipeline_net
+
+  persister:
+    build: ./persister
+    container_name: persister
+    depends_on:
+      - enricher
+      - mongo
+    networks:
+      - pipeline_net
+
+volumes:
+  mongo_data:
+
+networks:
+  pipeline_net:
+    driver: bridge
+
+
+
+#🔹 הסבר קצר
+#
+#services → כל שירות מקבל שם, תמונה או build, משתני סביבה ורשת.
+#
+#depends_on → מבטיח שהשירותים ירוצו לפי סדר תלות.
+#
+#volumes → מאפשר שמירה של נתונים במונגו גם אחרי עצירה.
+#
+#networks → רשת פנימית בין השירותים.
+#
+#2️⃣ איך מעדכנים את docker-compose.yml
+#
+#כל פעם שאתה משנה:
+#
+#Dockerfile של שירות
+#
+#משתני סביבה
+#
+#תלות בין שירותים
+#
+#ports או volumes
+#
+#אתה פשוט:
+#
+#docker-compose up -d --build
+#
+#
+#Compose מזהה שינויים ב‑Dockerfile או בקוד של השירותים
+#
+#בונה מחדש רק את מה שצריך
+#
+#מריץ את הקונטיינרים החדשים ברקע
+#
+#אם לא שינית את Dockerfile או הקוד ואתה רק רוצה להפעיל שירות חדש שנוסף ל־docker-compose.yml:
+#
+#docker-compose up -d
+#
+#
+#Compose יתחבר לשירותים הקיימים, יריץ את החדש בלי build מחדש.
+#
+#💡 טיפ שימושי:
+#
+#תמיד שמרו עותק של docker-compose.yml בתיקיית root של הפרויקט.
+#
+#אם מוסיפים שירות חדש, פשוט הוסיפו אותו ב־services: ואז docker-compose up -d – Compose יטפל בשאר.
+
+
+
+frfrfgrgfrgrgrgr

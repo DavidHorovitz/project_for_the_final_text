@@ -1,0 +1,30 @@
+# 1️⃣ הרצת MongoDB + כל השירותים ברקע
+docker-compose up -d
+
+# 2️⃣ לבדוק סטטוס הקונטיינרים
+docker-compose ps
+docker ps
+
+# 3️⃣ צפייה בלוגים של כל השירותים בזמן אמת
+docker-compose logs -f retriever
+docker-compose logs -f preprocessor
+docker-compose logs -f enricher
+docker-compose logs -f persister
+
+# 4️⃣ עצירה וניקוי של כל השירותים והרשתות
+docker-compose down
+
+# 5️⃣ הפעלה מחדש של שירות ספציפי בלי לעצור את כולם
+docker-compose restart retriever
+docker-compose restart preprocessor
+docker-compose restart enricher
+docker-compose restart persister
+
+# 6️⃣ מחיקת קונטיינר בודד (לבדיקה או ניקוי)
+docker rm <container_name>
+
+# 7️⃣ מחיקת תמונה ספציפית
+docker rmi <image_name>
+
+# 8️⃣ ניקוי כולל של כל הקונטיינרים, תמונות, רשתות
+docker system prune -a
