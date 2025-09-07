@@ -101,5 +101,77 @@ networks:
 #אם מוסיפים שירות חדש, פשוט הוסיפו אותו ב־services: ואז docker-compose up -d – Compose יטפל בשאר.
 
 
+הוספת Service חדש ל־docker-compose.yml
+📌 1. שמירה על אותו קובץ docker-compose.yml
 
-frfrfgrgfrgrgrgr
+תמיד עובדים עם אותו קובץ מרכזי.
+
+כל שירות חדש = בלוק חדש תחת services.
+
+📌 2. מבנה פרויקט מומלץ
+
+כל שירות בתיקייה משלו עם קוד + Dockerfile:
+
+project/
+  docker-compose.yml
+  service1/
+    Dockerfile
+    ...
+  service2/
+    Dockerfile
+    ...
+  service3/
+    Dockerfile
+    ...
+
+📌 3. הוספת Service חדש
+
+נניח שיש לך כבר backend ו־frontend, ועכשיו אתה מוסיף worker:
+
+services:
+  backend:
+    build:
+      context: ./backend
+    networks:
+      - my_network
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+    networks:
+      - my_network
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  worker:
+    build:
+      context: ./worker
+    networks:
+      - my_network
+    depends_on:
+      - backend
+
+networks:
+  my_network:
+    driver: bridge
+
+📌 4. מה קורה אחרי שהוספת Service חדש?
+
+להרים את כל המערכת (כולל השירות החדש):
+
+docker-compose up -d
+
+
+להרים רק את השירות החדש (בלי לגעת באחרים):
+
+docker-compose up -d worker
+
+
+אם שינית Dockerfile של שירות מסוים (צריך rebuild):
+
+docker-compose build worker
+docker-compose up -d worker
